@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# שריקת סיום · صافرة النهاية
 
-## Getting Started
+**דקה של בטיחות בסוף כל אימון** · دقيقة أمان في نهاية كل تدريب
 
-First, run the development server:
+## מה זה
+אפליקציה קטנה לפיילוט בג׳סר א-זרקא.
+- כל מאמן מקבל קישור אישי (בלי סיסמה). בקישור הוא רואה את תדריך הבטיחות של השבוע, הודעה לוואטסאפ ופלייר להורים. אחרי האימון הוא לוחץ "בוצע".
+- רכז הבטיחות (מנסור) והצוות נכנסים עם אימייל וסיסמה ל-`/admin`. שם יש לוח בקרה, מאמנים, קבוצות, תכנים, דוח והגדרות.
+- התוכנית נמשכת 10 שבועות. שבוע מתחיל ביום ראשון ונגמר בשבת בלילה (שעון ישראל).
 
+---
+
+## 1. הקמת Supabase (פעם אחת)
+1. נכנסים ל-https://supabase.com ולוחצים **Start your project**. נרשמים (אפשר עם GitHub).
+2. לוחצים **New project**. בוחרים שם (למשל `shrikat-siyum`), סיסמה למסד הנתונים (שומרים אותה בצד), ואזור **Central EU (Frankfurt)**. לוחצים **Create new project** ומחכים כ-2 דקות.
+3. בתפריט בצד לוחצים **SQL Editor**, ואז **New query**.
+4. פותחים את הקובץ `supabase/schema.sql` מהפרויקט, מעתיקים את כל התוכן ומדביקים. לוחצים **Run**. אמורה להופיע ההודעה "Success".
+5. יוצרים משתמש למנסור: בתפריט **Authentication**, אחר כך **Users**, **Add user** ו-**Create new user**. ממלאים אימייל וסיסמה, מסמנים **Auto Confirm User** ולוחצים **Create user**. חוזרים על זה לכל מי שצריך כניסה לניהול.
+6. סוגרים הרשמה חופשית: **Authentication**, אחר כך **Sign In / Providers**. מכבים את **Allow new users to sign up** ולוחצים **Save**.
+7. מעתיקים 3 מפתחות: **Project Settings** (גלגל השיניים), ואז **API Keys** (ו-**Data API** בשביל הכתובת):
+   - **Project URL**: נכנס ל-`NEXT_PUBLIC_SUPABASE_URL`
+   - **anon / publishable key**: נכנס ל-`NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - **service_role / secret key**: נכנס ל-`SUPABASE_SERVICE_ROLE_KEY`
+
+   ⚠️ את המפתח הסודי (service_role / secret) לא שולחים לאף אחד ולא מדביקים בצ׳אט.
+
+## 2. העלאה לאוויר ב-Vercel
+צריך שהקוד יהיה ב-GitHub. אם עוד לא העלינו אותו, בקשי ממני.
+1. נכנסים ל-https://vercel.com ולוחצים **Sign Up**. בוחרים **Hobby** (חינם) ומתחברים עם GitHub.
+2. לוחצים **Add New…** ואז **Project**. ליד המאגר `shrikat-siyum` לוחצים **Import**.
+3. פותחים את **Environment Variables** ומוסיפים 4 שורות:
+   | Key | Value |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | Project URL מ-Supabase |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | anon / publishable key |
+   | `SUPABASE_SERVICE_ROLE_KEY` | service_role / secret key |
+   | `NEXT_PUBLIC_SITE_URL` | בינתיים `https://shrikat-siyum.vercel.app` |
+4. לוחצים **Deploy** ומחכים כ-2 דקות.
+5. מעתיקים את הכתובת שקיבלתם (למשל `https://shrikat-siyum.vercel.app`). אם היא שונה ממה שכתבתם בשלב 3: **Settings**, אחר כך **Environment Variables**, ומעדכנים את `NEXT_PUBLIC_SITE_URL`. אחר כך **Deployments**, לוחצים על שלוש הנקודות ליד הגרסה האחרונה ובוחרים **Redeploy**.
+6. נכנסים ל-`<הכתובת>/admin` עם המשתמש מסעיף 1.5.
+
+## 3. התחלת התוכנית
+1. **הגדרות**: קובעים את תאריך ההתחלה. חייב להיות יום ראשון.
+2. **תכנים**: ממלאים לכל שבוע כותרת, תדריך והודעה להורים בעברית ובערבית, ומעלים פלייר (תמונה או PDF, עד 5MB). אם שפה אחת ריקה, המאמן יראה את השפה השנייה.
+3. **מאמנים**: מוסיפים מאמן (שם, תפקיד, טלפון, שפה). הקישור האישי נוצר לבד.
+4. **קבוצות**: מוסיפים קבוצות ומשייכים כל אחת למאמן. למאמן יכולות להיות כמה קבוצות.
+
+## 4. שליחת הקישור למאמן
+בדף **מאמנים**, בכרטיס של המאמן:
+- **שלח בוואטסאפ** פותח וואטסאפ עם הודעת ברוכים הבאים והקישור, בשפה של המאמן. לוחצים "שלח".
+- **העתק קישור** מעתיק רק את הקישור.
+- **צור קישור חדש**: אם המאמן החליף טלפון או שהקישור הגיע למישהו אחר. הקישור הישן מפסיק לעבוד מיד, ושולחים למאמן את החדש.
+
+בלוח הבקרה, ברשימה **לא העבירו השבוע**, הכפתור **שלח תזכורת** פותח וואטסאפ למאמן עם הודעת תזכורת.
+
+## 5. נתוני דמו (לניסיון בלבד)
+צריך מחשב עם Node.js 20 ומעלה, וקובץ `.env.local` עם 4 המפתחות. הקובץ `.env.example` מראה איך הוא בנוי.
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
 ```
+```bash
+npm run seed:demo
+```
+הסקריפט מוסיף 10 "מאמני דמו", 14 קבוצות, תכני דמו לשבועות 1–3 והיסטוריית ביצוע. התכנים נוספים רק לשבועות שעוד ריקים, אז תוכן אמיתי לא נדרס. לפני שהוא משנה משהו הוא מציג את כתובת מסד הנתונים ומבקש להקליד `yes`.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+כדי למחוק רק את נתוני הדמו:
+```bash
+npm run seed:clear
+```
+תאריך ההתחלה בהגדרות לא משתנה. אם הדמו קבע אותו, צריך לעדכן אותו ידנית.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+⚠️ לא מריצים דמו על מסד הנתונים האמיתי בזמן הפיילוט.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## לצוות טכני
+- Next.js (App Router) + TypeScript + Tailwind, ו-Supabase (Postgres, Auth, Storage). רץ על Vercel.
+- **אבטחה:** RLS פעיל על כל הטבלאות בלי policies. כל הגישה לנתונים עוברת בשרת עם מפתח ה-service-role (`src/lib/supabase/admin.ts`, `server-only`). את `/admin` מגנים גם ה-middleware וגם `requireAdmin()` בכל דף ובכל פעולה. המאמן מזוהה לפי טוקן אקראי (32 בייט), ובכל פעולה השרת בודק מחדש מאמן פעיל, בעלות על הקבוצה ושבוע נוכחי. פליירים עולים דרך signed upload URL.
+- **לוגיקה טהורה עם בדיקות:** `src/lib/week.ts` (שבועות, שעון ישראל, שעון קיץ), `src/lib/phone.ts` (וואטסאפ), `src/lib/stats.ts` (לוח בקרה), `src/lib/validate.ts`.
+- **טקסטים:** כולם בקובץ אחד, `src/lib/i18n/dict.ts`.
+- **פקודות:**
+  ```bash
+  npm run dev
+  ```
+  ```bash
+  npm run typecheck && npm run lint && npm test && npm run build
+  ```
