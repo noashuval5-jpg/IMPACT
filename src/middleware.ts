@@ -1,3 +1,4 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { isLang, LANG_COOKIE, type Lang } from "@/lib/i18n/dict";
 
@@ -23,8 +24,46 @@ async function coachLanguage(token: string): Promise<Lang | null> {
   }
 }
 
+/** Refreshes the Supabase session and redirects to login when there is none. */
+async function guardAdmin(request: NextRequest): Promise<NextResponse> {
+  let response = NextResponse.next({ request });
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll: () => request.cookies.getAll(),
+        setAll: (list) => {
+          list.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          list.forEach(({ name, value, options }) => response.cookies.set(name, value, options));
+        },
+      },
+    },
+  );
+  const { data } = await supabase.auth.getUser();
+  const isLogin = request.nextUrl.pathname === "/admin/login";
+  if (!data.user && !isLogin) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin/login";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+  if (data.user && isLogin) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/admin";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+  return response;
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    return guardAdmin(request);
+  }
 
   // Coach page: on first visit (no language cookie yet) use the coach's language.
   const match = COACH_PATH.exec(pathname);
@@ -42,5 +81,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/c/:path*"],
+  matcher: ["/c/:path*", "/admin", "/admin/:path*"],
 };

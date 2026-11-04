@@ -11,7 +11,7 @@ export function Card({
 }) {
   return (
     <section
-      className={`print-card rounded-2xl border border-line bg-white p-5 shadow-sm ${className}`}
+      className={`print-card min-w-0 rounded-2xl border border-line bg-white p-5 shadow-sm ${className}`}
     >
       {title ? <h2 className="mb-3 text-lg font-bold text-brand">{title}</h2> : null}
       {children}
