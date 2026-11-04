@@ -126,6 +126,10 @@ const he = {
   back: "חזרה",
   noData: "אין עדיין נתונים",
   of: "מתוך",
+  townName: "ג׳סר א-זרקא",
+  reportTitle: "דוח ביצוע – תדריכי בטיחות",
+  doneOutOf: "{done} מתוך {total}",
+  totalCoaches: "מתוך {n} מאמנים",
 } as const;
 
 export type DictKey = keyof typeof he;
@@ -243,6 +247,10 @@ const ar: Dict = {
   back: "رجوع",
   noData: "لا توجد بيانات بعد",
   of: "من",
+  townName: "جسر الزرقاء",
+  reportTitle: "تقرير التنفيذ – إرشادات السلامة",
+  doneOutOf: "{done} من {total}",
+  totalCoaches: "من أصل {n} مدربين",
 };
 
 export const dictionaries: Record<Lang, Dict> = { he, ar };

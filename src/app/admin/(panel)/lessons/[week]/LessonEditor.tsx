@@ -72,7 +72,7 @@ function FlyerInput({
 
       ) : null}
       <label
-        className={`flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-dashed border-brand/40 bg-page px-4 text-sm font-medium text-brand hover:bg-brand-soft ${busy ? "opacity-60" : ""}`}
+        className={`relative flex min-h-12 cursor-pointer items-center justify-center rounded-xl border border-dashed border-brand/40 bg-page px-4 text-sm font-medium text-brand hover:bg-brand-soft ${busy ? "opacity-60" : ""}`}
       >
         ⬆ {t.flyer}
         <input

@@ -52,7 +52,17 @@ html[lang="ar"] body {
   .print-card {
     box-shadow: none !important;
     border: 1px solid #d1d5db !important;
+  }
+  tr,
+  figure,
+  h2 {
     break-inside: avoid;
+  }
+  h2 {
+    break-after: avoid;
+  }
+  main {
+    padding: 0 !important;
   }
   * {
     -webkit-print-color-adjust: exact;
