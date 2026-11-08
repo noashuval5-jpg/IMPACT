@@ -15,9 +15,10 @@
 2. לוחצים **New project**. בוחרים שם (למשל `shrikat-siyum`), סיסמה למסד הנתונים (שומרים אותה בצד), ואזור **Central EU (Frankfurt)**. לוחצים **Create new project** ומחכים כ-2 דקות.
 3. בתפריט בצד לוחצים **SQL Editor**, ואז **New query**.
 4. פותחים את הקובץ `supabase/schema.sql` מהפרויקט, מעתיקים את כל התוכן ומדביקים. לוחצים **Run**. אמורה להופיע ההודעה "Success".
-5. יוצרים משתמש למנסור: בתפריט **Authentication**, אחר כך **Users**, **Add user** ו-**Create new user**. ממלאים אימייל וסיסמה, מסמנים **Auto Confirm User** ולוחצים **Create user**. חוזרים על זה לכל מי שצריך כניסה לניהול.
-6. סוגרים הרשמה חופשית: **Authentication**, אחר כך **Sign In / Providers**. מכבים את **Allow new users to sign up** ולוחצים **Save**.
-7. מעתיקים 3 מפתחות: **Project Settings** (גלגל השיניים), ואז **API Keys** (ו-**Data API** בשביל הכתובת):
+5. מוסיפים את התכנים של 10 השבועות: שוב **SQL Editor** ו-**New query**. מדביקים את כל התוכן של `supabase/lessons.sql` ולוחצים **Run**. התדריכים, ההודעות להורים והפליירים (בעברית ובערבית) נכנסים בבת אחת. אפשר לערוך כל שבוע אחר כך בדף **תכנים**.
+6. יוצרים משתמש למנסור: בתפריט **Authentication**, אחר כך **Users**, **Add user** ו-**Create new user**. ממלאים אימייל וסיסמה, מסמנים **Auto Confirm User** ולוחצים **Create user**. חוזרים על זה לכל מי שצריך כניסה לניהול.
+7. סוגרים הרשמה חופשית: **Authentication**, אחר כך **Sign In / Providers**. מכבים את **Allow new users to sign up** ולוחצים **Save**.
+8. מעתיקים 3 מפתחות: **Project Settings** (גלגל השיניים), ואז **API Keys** (ו-**Data API** בשביל הכתובת):
    - **Project URL**: נכנס ל-`NEXT_PUBLIC_SUPABASE_URL`
    - **anon / publishable key**: נכנס ל-`NEXT_PUBLIC_SUPABASE_ANON_KEY`
    - **service_role / secret key**: נכנס ל-`SUPABASE_SERVICE_ROLE_KEY`
@@ -37,11 +38,12 @@
    | `NEXT_PUBLIC_SITE_URL` | בינתיים `https://shrikat-siyum.vercel.app` |
 4. לוחצים **Deploy** ומחכים כ-2 דקות.
 5. מעתיקים את הכתובת שקיבלתם (למשל `https://shrikat-siyum.vercel.app`). אם היא שונה ממה שכתבתם בשלב 3: **Settings**, אחר כך **Environment Variables**, ומעדכנים את `NEXT_PUBLIC_SITE_URL`. אחר כך **Deployments**, לוחצים על שלוש הנקודות ליד הגרסה האחרונה ובוחרים **Redeploy**.
-6. נכנסים ל-`<הכתובת>/admin` עם המשתמש מסעיף 1.5.
+6. נכנסים ל-`<הכתובת>/admin` עם המשתמש מסעיף 1.6.
 
 ## 3. התחלת התוכנית
 1. **הגדרות**: קובעים את תאריך ההתחלה. חייב להיות יום ראשון.
-2. **תכנים**: ממלאים לכל שבוע כותרת, תדריך והודעה להורים בעברית ובערבית, ומעלים פלייר (תמונה או PDF, עד 5MB). אם שפה אחת ריקה, המאמן יראה את השפה השנייה.
+2. **תכנים**: אם הדבקתם את `supabase/lessons.sql`, כל 10 השבועות כבר מלאים. אפשר לערוך כל שבוע או להעלות פלייר אחר (תמונה או PDF, עד 5MB). אם שפה אחת ריקה, המאמן יראה את השפה השנייה.
+   - מקור התכנים: `supabase/content/lessons.he.txt` ו-`lessons.ar.txt`. אחרי שינוי בהם מריצים `npm run build:lessons` ומדביקים שוב את `supabase/lessons.sql`.
 3. **מאמנים**: מוסיפים מאמן (שם, תפקיד, טלפון, שפה). הקישור האישי נוצר לבד.
 4. **קבוצות**: מוסיפים קבוצות ומשייכים כל אחת למאמן. למאמן יכולות להיות כמה קבוצות.
 

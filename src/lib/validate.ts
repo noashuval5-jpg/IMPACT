@@ -51,8 +51,12 @@ export function parseWeek(value: unknown): number | null {
   return Number.isInteger(n) && n >= 1 && n <= 10 ? n : null;
 }
 
-/** A flyer URL is accepted only when it points into our public "flyers" bucket. */
+/**
+ * A flyer URL is accepted only when it points into our public "flyers" bucket,
+ * or to one of the built-in flyers shipped with the app (/flyers/he|ar/week-NN.png).
+ */
 export function isOurFlyerUrl(url: string, supabaseUrl: string): boolean {
+  if (/^\/flyers\/(he|ar)\/week-(0[1-9]|10)\.png$/.test(url)) return true;
   const prefix = `${supabaseUrl.replace(/\/+$/, "")}/storage/v1/object/public/flyers/`;
   return url.startsWith(prefix) && !url.includes("..");
 }

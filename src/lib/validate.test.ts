@@ -43,5 +43,9 @@ describe("parseWeek / isOurFlyerUrl", () => {
     const base = "https://abc.supabase.co";
     expect(isOurFlyerUrl(`${base}/storage/v1/object/public/flyers/week-1/he.png`, base)).toBe(true);
     expect(isOurFlyerUrl("https://evil.example/flyers/x.png", base)).toBe(false);
+    expect(isOurFlyerUrl("/flyers/he/week-01.png", base)).toBe(true);
+    expect(isOurFlyerUrl("/flyers/ar/week-10.png", base)).toBe(true);
+    expect(isOurFlyerUrl("/flyers/../secret.png", base)).toBe(false);
+    expect(isOurFlyerUrl("//evil.example/flyers/he/week-01.png", base)).toBe(false);
   });
 });

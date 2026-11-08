@@ -10,6 +10,33 @@ export type LessonViewData = {
   flyerUrl: string;
 };
 
+/** Short lines like "2. עשה ואל תעשה" or "עשה:" become bold headings; the rest stays plain text. */
+function isHeading(line: string): boolean {
+  const t = line.trim();
+  if (t.length === 0 || t.length > 45 || t.includes("«")) return false;
+  return /^\d\.\s/.test(t) || t.endsWith(":") || t.endsWith("):");
+}
+
+function BriefingText({ text }: { text: string }) {
+  return (
+    <div className="grid gap-1 text-base leading-relaxed">
+      {text.split("\n").map((line, i) =>
+        line.trim() === "" ? (
+          <div key={i} className="h-2" aria-hidden="true" />
+        ) : isHeading(line) ? (
+          <p key={i} className="mt-1 font-bold text-brand">
+            {line}
+          </p>
+        ) : (
+          <p key={i} className={line.startsWith("•") ? "ps-2" : undefined}>
+            {line}
+          </p>
+        ),
+      )}
+    </div>
+  );
+}
+
 function isPdf(url: string): boolean {
   return /\.pdf($|\?)/i.test(url);
 }
@@ -32,7 +59,7 @@ export function LessonCards({ t, lesson }: { t: Dict; lesson: LessonViewData | n
     <>
       <Card title={t.safetyBriefing}>
         {lesson.title ? <h3 className="mb-2 text-xl font-bold">{lesson.title}</h3> : null}
-        <p className="whitespace-pre-line text-base leading-relaxed">{lesson.briefing}</p>
+        <BriefingText text={lesson.briefing} />
       </Card>
 
       {lesson.message || lesson.flyerUrl ? (
