@@ -1,4 +1,5 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
 import { isLang, LANG_COOKIE, type Lang } from "@/lib/i18n/dict";
 
@@ -11,13 +12,16 @@ async function coachLanguage(token: string): Promise<Lang | null> {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key) return null;
   try {
-    const res = await fetch(
-      `${url}/rest/v1/coaches?select=language&active=eq.true&token=eq.${encodeURIComponent(token)}`,
-      { headers: { apikey: key, Authorization: `Bearer ${key}` }, cache: "no-store" },
-    );
-    if (!res.ok) return null;
-    const rows = (await res.json()) as { language?: unknown }[];
-    const lang = rows[0]?.language;
+    const supabase = createClient(url, key, {
+      auth: { persistSession: false, autoRefreshToken: false },
+    });
+    const { data } = await supabase
+      .from("coaches")
+      .select("language")
+      .eq("token", token)
+      .eq("active", true)
+      .maybeSingle();
+    const lang: unknown = data?.language;
     return isLang(lang) ? lang : null;
   } catch {
     return null;
