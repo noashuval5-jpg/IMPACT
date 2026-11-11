@@ -33,7 +33,7 @@ export function LangToggle({ current }: { current: Lang }) {
           onClick={() => choose(o.lang)}
           aria-pressed={o.lang === current}
           className={`min-h-10 rounded-full px-3 font-medium transition-colors ${
-            o.lang === current ? "bg-brand text-white" : "text-ink hover:bg-brand-soft"
+            o.lang === current ? "bg-sky font-bold text-ink" : "text-ink hover:bg-brand-soft"
           }`}
         >
           {o.label}

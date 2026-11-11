@@ -1,4 +1,5 @@
 import { TopBar } from "@/components/TopBar";
+import { Hero } from "@/components/Hero";
 import { Card } from "@/components/ui";
 import { getI18n } from "@/lib/i18n/server";
 import { LoginForm } from "./LoginForm";
@@ -10,8 +11,9 @@ export default async function LoginPage() {
   return (
     <>
       <TopBar lang={lang} t={t} />
-      <main className="mx-auto max-w-sm px-4 py-12">
-        <Card title={t.loginTitle}>
+      <main className="mx-auto grid max-w-sm gap-4 px-4 py-10">
+        <Hero title={t.appName} subtitle={t.tagline} />
+        <Card title={t.loginTitle} accent="grape">
           <LoginForm t={t} />
         </Card>
       </main>

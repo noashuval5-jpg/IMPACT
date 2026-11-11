@@ -21,14 +21,14 @@ export function WeeklyChart({
         {ALL_WEEKS.map((w) => {
           const item = byWeek.get(w);
           const pct = item?.pct ?? 0;
-          const tone = pct >= 80 ? "bg-ok" : pct >= 50 ? "bg-brand" : "bg-bad";
+          const tone = pct >= 80 ? "bg-lime" : pct >= 50 ? "bg-sky" : "bg-flame";
           return (
             <div key={w} className="flex h-full flex-1 flex-col items-center justify-end">
               {item ? (
                 <>
                   <span className="mb-1 text-xs font-semibold tabular-nums">{pct}%</span>
                   <div
-                    className={`w-full max-w-10 rounded-t-md ${tone}`}
+                    className={`w-full max-w-10 rounded-t-xl ${tone} shadow-[inset_0_-6px_0_0_rgb(0_0_0/0.08)] transition-all`}
                     style={{ height: `${Math.max(pct, 2)}%` }}
                     title={`${fillTemplate(t.week, { n: w })}: ${fillTemplate(t.doneOutOf, {
                       done: item.done,

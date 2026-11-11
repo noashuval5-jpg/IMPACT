@@ -30,7 +30,7 @@ export default async function CoachesPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="text-2xl font-bold">{t.coaches}</h1>
+      <h1 className="flex items-center gap-2 text-2xl font-extrabold"><span aria-hidden="true" className="h-3 w-3 rounded-full bg-sky ring-4 ring-brand-soft" />{t.coaches}</h1>
       <CoachesManager t={t} rows={rows} />
     </div>
   );

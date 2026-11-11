@@ -1,7 +1,9 @@
 import { ProgramStatusLine } from "@/components/ProgramStatusLine";
 import { Matrix, NeverBadge } from "@/components/stats/Matrix";
 import { WeeklyChart } from "@/components/stats/WeeklyChart";
-import { btn, Card } from "@/components/ui";
+import { AlertIcon, ChartIcon, CheckCircleIcon, GridIcon, UsersIcon, WhatsAppIcon } from "@/components/icons";
+import { Hero } from "@/components/Hero";
+import { btn, Card, type Accent } from "@/components/ui";
 import { requireAdmin } from "@/lib/auth";
 import { coachLink, siteUrl } from "@/lib/data/admin";
 import { loadStats } from "@/lib/data/stats";
@@ -13,21 +15,36 @@ function StatCard({
   label,
   value,
   sub,
-  tone = "brand",
+  accent,
+  icon,
   children,
 }: {
   label: string;
   value: string;
   sub?: string;
-  tone?: "brand" | "ok" | "bad";
+  accent: Accent;
+  icon: React.ReactNode;
   children?: React.ReactNode;
 }) {
-  const color = tone === "ok" ? "text-ok" : tone === "bad" ? "text-bad" : "text-brand";
+  const bubble: Record<Accent, string> = {
+    sky: "bg-sky text-ink",
+    lime: "bg-lime text-ink",
+    sun: "bg-sun text-ink",
+    grape: "bg-grape text-white",
+    flame: "bg-flame text-ink",
+  };
   return (
-    <Card>
-      <p className="text-sm font-medium text-muted">{label}</p>
-      <p className={`mt-1 text-3xl font-bold tabular-nums ${color}`}>{value}</p>
-      {sub ? <p className="mt-1 text-sm text-muted">{sub}</p> : null}
+    <Card accent={accent}>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-muted">{label}</p>
+          <p className="mt-1 text-4xl font-extrabold tabular-nums text-ink">{value}</p>
+          {sub ? <p className="mt-1 text-sm text-muted">{sub}</p> : null}
+        </div>
+        <span className={`inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${bubble[accent]}`}>
+          {icon}
+        </span>
+      </div>
       {children}
     </Card>
   );
@@ -47,10 +64,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="grid min-w-0 gap-5">
-      <div>
-        <h1 className="text-2xl font-bold">{t.dashboard}</h1>
-        <ProgramStatusLine t={t} status={status} startDate={startDate} />
-      </div>
+      <Hero
+        title={t.dashboard}
+        subtitle={
+          <ProgramStatusLine t={t} status={status} startDate={startDate} className="font-semibold text-ink" />
+        }
+      />
 
       {status.kind === "active" ? (
         <div className="grid gap-4 sm:grid-cols-3">
@@ -61,18 +80,21 @@ export default async function DashboardPage() {
               done: stats.current.delivered,
               total: stats.current.total,
             })}
-            tone={stats.current.pct >= 80 ? "ok" : "brand"}
+            accent="lime"
+            icon={<CheckCircleIcon className="h-6 w-6" />}
           />
           <StatCard
             label={t.notDeliveredThisWeek}
             value={String(pending.length)}
             sub={fillTemplate(t.totalCoaches, { n: stats.current.total })}
-            tone={pending.length > 0 ? "bad" : "ok"}
+            accent="sun"
+            icon={<UsersIcon className="h-6 w-6" />}
           />
           <StatCard
             label={t.coachesNever}
             value={String(stats.neverCount)}
-            tone={stats.neverCount > 0 ? "bad" : "ok"}
+            accent="grape"
+            icon={<AlertIcon className="h-6 w-6" />}
           >
             {never.length > 0 ? (
               <ul className="mt-2 grid gap-1 text-sm">
@@ -89,7 +111,7 @@ export default async function DashboardPage() {
       ) : null}
 
       {status.kind === "active" ? (
-        <Card title={t.notDeliveredThisWeek}>
+        <Card title={t.notDeliveredThisWeek} icon={<UsersIcon />} accent="flame">
           {pending.length === 0 ? (
             <p className="text-ok">✓ {t.everyoneDelivered}</p>
           ) : (
@@ -124,6 +146,7 @@ export default async function DashboardPage() {
                         rel="noopener noreferrer"
                         className={btn.whatsapp + " min-h-11 px-4 text-sm"}
                       >
+                        <WhatsAppIcon />
                         {t.sendReminder}
                       </a>
                     ) : (
@@ -138,12 +161,12 @@ export default async function DashboardPage() {
       ) : null}
 
       {stats.weekly.length > 0 ? (
-        <Card title={t.completionByWeek}>
+        <Card title={t.completionByWeek} icon={<ChartIcon />} accent="sky">
           <WeeklyChart t={t} weekly={stats.weekly} />
         </Card>
       ) : null}
 
-      <Card title={t.weeklyTracking}>
+      <Card title={t.weeklyTracking} icon={<GridIcon />} accent="lime">
         <Matrix t={t} rows={stats.rows} neverIds={neverIds} />
       </Card>
     </div>

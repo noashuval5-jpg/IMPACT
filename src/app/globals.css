@@ -1,19 +1,35 @@
 @import "tailwindcss";
 
+/*
+ * Palette (brand sheet):
+ *   sky #4dc1e5 (Pantone 2985) · grey #b6bbbf (Cool Grey 8)
+ *   lime #a7d05b (376) · sun #ffd503 (116) · grape #784199 (526) · flame #f15730 (179)
+ * The bright colours are used as backgrounds and decoration. Text uses a darker
+ * shade of the same hue so it stays readable (WCAG AA on white).
+ */
 @theme {
-  --color-brand: #1e3a8a;
-  --color-brand-dark: #172e6e;
-  --color-brand-soft: #e8eefb;
-  --color-ok: #15803d;
-  --color-ok-soft: #e7f6ec;
-  --color-bad: #b91c1c;
-  --color-bad-soft: #fdecec;
-  --color-warn: #a16207;
-  --color-warn-soft: #fdf6dd;
-  --color-ink: #1f2937;
-  --color-muted: #5b6474;
-  --color-line: #e5e7eb;
-  --color-page: #f6f7fb;
+  --color-sky: #4dc1e5;
+  --color-sky-dark: #2fb0d8;
+  --color-grey: #b6bbbf;
+  --color-lime: #a7d05b;
+  --color-sun: #ffd503;
+  --color-grape: #784199;
+  --color-flame: #f15730;
+
+  --color-brand: #0b6683; /* deep sky, for text and filled states with white text */
+  --color-brand-dark: #08536b;
+  --color-brand-soft: #e4f5fb;
+  --color-grape-soft: #f2eaf7;
+  --color-ok: #4a7a10;
+  --color-ok-soft: #eef7dc;
+  --color-bad: #c2401c;
+  --color-bad-soft: #fde7e0;
+  --color-warn: #7a5d00;
+  --color-warn-soft: #fff6c4;
+  --color-ink: #123542;
+  --color-muted: #5b6670;
+  --color-line: #e2e6e9;
+  --color-page: #f3f9fb;
 }
 
 html {
@@ -31,9 +47,85 @@ html[lang="ar"] body {
   font-family: var(--font-ar), var(--font-he), system-ui, sans-serif;
 }
 
+/* Soft palette circles in the page background (decoration only). */
+.decor-bg {
+  background:
+    radial-gradient(circle at 105% -5%, rgb(77 193 229 / 0.18) 0 180px, transparent 181px),
+    radial-gradient(circle at -6% 38%, rgb(255 213 3 / 0.16) 0 120px, transparent 121px),
+    radial-gradient(circle at 104% 70%, rgb(167 208 91 / 0.16) 0 140px, transparent 141px),
+    radial-gradient(circle at -4% 100%, rgb(120 65 153 / 0.1) 0 160px, transparent 161px),
+    var(--color-page);
+  background-attachment: fixed;
+}
+
+/* Entrance animation for cards. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.rise {
+  animation: rise 0.45s ease-out both;
+}
+
+/* "Done" celebration: palette dots burst out of the button. */
+@keyframes burst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(0.6);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--dy)) scale(1);
+  }
+}
+.burst-dot {
+  animation: burst 0.9s ease-out forwards;
+}
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+.pop {
+  animation: pop 0.4s ease-out both;
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+.float {
+  animation: float 4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .burst-dot,
+  .pop,
+  .float {
+    animation: none !important;
+  }
+}
+
 /* Keep focus visible for keyboard users. */
 :focus-visible {
-  outline: 3px solid var(--color-brand);
+  outline: 3px solid var(--color-grape);
   outline-offset: 2px;
 }
 

@@ -78,7 +78,7 @@ export default async function ReportPage() {
                     <div className="flex items-center gap-2">
                       <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-page">
                         <div
-                          className={`h-full rounded-full ${c.rate >= 80 ? "bg-ok" : c.rate >= 50 ? "bg-brand" : "bg-bad"}`}
+                          className={`h-full rounded-full ${c.rate >= 80 ? "bg-lime" : c.rate >= 50 ? "bg-sky" : "bg-flame"}`}
                           style={{ width: `${c.rate}%` }}
                         />
                       </div>

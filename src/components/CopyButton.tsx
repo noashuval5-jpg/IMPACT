@@ -26,11 +26,13 @@ export function CopyButton({
   label,
   copiedLabel,
   className,
+  icon,
 }: {
   text: string;
   label: string;
   copiedLabel: string;
   className: string;
+  icon?: React.ReactNode;
 }) {
   const [copied, setCopied] = useState(false);
   return (
@@ -44,6 +46,7 @@ export function CopyButton({
         }
       }}
     >
+      {copied ? null : icon}
       <span aria-live="polite">{copied ? `✓ ${copiedLabel}` : label}</span>
     </button>
   );

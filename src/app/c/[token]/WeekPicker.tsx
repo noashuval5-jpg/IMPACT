@@ -30,19 +30,19 @@ export function WeekPicker({
                 aria-label={
                   fillTemplate(t.week, { n: w }) + (isCurrent ? ` (${t.currentWeekBadge})` : "")
                 }
-                className={`relative flex min-h-12 items-center justify-center rounded-xl border text-lg font-bold tabular-nums ${
+                className={`relative flex min-h-12 items-center justify-center rounded-2xl border-2 text-lg transition font-bold tabular-nums ${
                   isSelected
-                    ? "border-brand bg-brand text-white"
+                    ? "border-sky bg-sky text-ink shadow-[0_3px_0_0_#2a9cc0]"
                     : isCurrent
-                      ? "border-brand bg-brand-soft text-brand"
-                      : "border-line bg-white text-ink hover:bg-brand-soft"
+                      ? "border-sun bg-warn-soft text-ink"
+                      : "border-line bg-white text-ink hover:border-sky hover:bg-brand-soft"
                 }`}
               >
                 {w}
                 {isCurrent ? (
                   <span
                     aria-hidden="true"
-                    className={`absolute top-1.5 end-1.5 h-2 w-2 rounded-full ${isSelected ? "bg-white" : "bg-brand"}`}
+                    className={"absolute top-1.5 end-1.5 h-2.5 w-2.5 rounded-full bg-grape ring-2 ring-white"}
                   />
                 ) : null}
               </Link>

@@ -4,9 +4,9 @@ import type { CellState, MatrixRow } from "@/lib/stats";
 import { ALL_WEEKS } from "@/lib/week";
 
 const CELL: Record<CellState, { cls: string; mark: string }> = {
-  done: { cls: "bg-ok-soft text-ok", mark: "✓" },
-  missed: { cls: "bg-bad-soft text-bad", mark: "✗" },
-  pending: { cls: "bg-warn-soft text-warn", mark: "•" },
+  done: { cls: "bg-lime text-ink", mark: "✓" },
+  missed: { cls: "bg-bad-soft text-bad ring-1 ring-flame/40", mark: "✗" },
+  pending: { cls: "bg-sun/70 text-ink", mark: "•" },
   future: { cls: "bg-page text-muted/50", mark: "" },
 };
 
@@ -40,7 +40,7 @@ export function Legend({ t }: { t: Dict }) {
 
 export function NeverBadge({ t }: { t: Dict }) {
   return (
-    <span className="ms-1 inline-flex items-center rounded-full bg-bad px-2 py-0.5 text-[11px] font-bold text-white">
+    <span className="ms-1 inline-flex items-center rounded-full bg-grape px-2 py-0.5 text-[11px] font-bold text-white">
       {t.never}
     </span>
   );

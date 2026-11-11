@@ -12,7 +12,7 @@ export default function ErrorPage({ reset }: { error: Error; reset: () => void }
       <button
         type="button"
         onClick={reset}
-        className="mt-8 inline-flex min-h-12 items-center rounded-xl bg-brand px-6 font-semibold text-white"
+        className="mt-8 inline-flex min-h-12 items-center rounded-2xl bg-sky px-6 font-bold text-ink"
       >
         ↻
       </button>

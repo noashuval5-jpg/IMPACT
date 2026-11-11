@@ -20,7 +20,7 @@ function Pill({ ok, label, t }: { ok: boolean; label: string; t: Dict }) {
   return (
     <span
       className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${
-        ok ? "bg-ok-soft text-ok" : "bg-bad-soft text-bad"
+        ok ? "bg-ok-soft text-ok ring-1 ring-lime" : "bg-bad-soft text-bad ring-1 ring-flame/40"
       }`}
     >
       {label}: {ok ? t.filled : t.empty}
@@ -37,7 +37,7 @@ export default async function LessonsPage() {
 
   return (
     <div className="grid gap-4">
-      <h1 className="text-2xl font-bold">{t.lessons}</h1>
+      <h1 className="flex items-center gap-2 text-2xl font-extrabold"><span aria-hidden="true" className="h-3 w-3 rounded-full bg-sky ring-4 ring-brand-soft" />{t.lessons}</h1>
       <Card>
         <ul className="divide-y divide-line">
           {ALL_WEEKS.map((w) => {
@@ -52,7 +52,7 @@ export default async function LessonsPage() {
                   <span className="min-w-0">
                     <span className="font-semibold">{fillTemplate(t.week, { n: w })}</span>
                     {w === now ? (
-                      <span className="ms-2 rounded-full bg-brand px-2 py-0.5 text-xs text-white">
+                      <span className="ms-2 rounded-full bg-grape px-2 py-0.5 text-xs font-semibold text-white">
                         {t.thisWeek}
                       </span>
                     ) : null}

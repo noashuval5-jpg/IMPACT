@@ -192,7 +192,7 @@ export function LessonEditor({
                 type="button"
                 onClick={() => setPreviewLang(l)}
                 aria-pressed={previewLang === l}
-                className={`min-h-10 rounded-full px-3 ${previewLang === l ? "bg-brand text-white" : ""}`}
+                className={`min-h-10 rounded-full px-3 ${previewLang === l ? "bg-sky font-bold text-ink" : ""}`}
               >
                 {l === "he" ? "עברית" : "العربية"}
               </button>

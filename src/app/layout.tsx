@@ -28,7 +28,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#1e3a8a",
+  themeColor: "#4dc1e5",
 };
 
 export default async function RootLayout({
@@ -37,7 +37,7 @@ export default async function RootLayout({
   const { lang } = await getI18n();
   return (
     <html lang={lang} dir="rtl" className={`${notoHebrew.variable} ${notoArabic.variable}`}>
-      <body>{children}</body>
+      <body className="decor-bg">{children}</body>
     </html>
   );
 }
