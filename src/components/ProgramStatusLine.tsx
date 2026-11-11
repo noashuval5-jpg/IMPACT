@@ -13,8 +13,9 @@ export function ProgramStatusLine({
   status: ProgramStatus;
   startDate: string | null;
 }) {
-  if (!startDate) return <p className="text-muted">{t.startDateNotSet}</p>;
-  if (status.kind === "not_started") return <p className="text-muted">{t.notStarted}</p>;
+  if (!startDate || status.kind === "not_started") {
+    return <p className="text-muted">{t.notStarted}</p>;
+  }
   if (status.kind === "finished") return <p className="text-muted">{t.finished}</p>;
   return (
     <p className="text-muted">

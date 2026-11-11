@@ -13,7 +13,6 @@ export function AdminNav({ t }: { t: Dict }) {
     { href: "/admin/groups", label: t.groups },
     { href: "/admin/lessons", label: t.lessons },
     { href: "/admin/report", label: t.report },
-    { href: "/admin/settings", label: t.settings },
   ];
   return (
     <nav className="mx-auto flex max-w-6xl items-center gap-1 overflow-x-auto px-2 pb-2">

@@ -76,6 +76,26 @@ export function addDays(date: string, days: number): string {
   return new Date((d + days) * 86_400_000).toISOString().slice(0, 10);
 }
 
+/** The Sunday ("YYYY-MM-DD") that starts the Jerusalem week containing `now`. */
+export function currentSunday(now: Date): string {
+  const today = jerusalemDate(now);
+  const day = toUtcDay(today);
+  if (day === null) throw new Error("Invalid date");
+  const dow = new Date(day * 86_400_000).getUTCDay(); // 0 = Sunday
+  return addDays(today, -dow);
+}
+
+/**
+ * Start date to use: the stored one, unless it is missing or in the future.
+ * Then the program starts this week, so coaches see content right away.
+ * Returns null when the stored date is fine as is.
+ */
+export function startDateToSave(stored: string | null | undefined, now: Date): string | null {
+  const sunday = currentSunday(now);
+  if (!stored || !isValidDate(stored) || daysBetween(stored, sunday) < 0) return sunday;
+  return null;
+}
+
 /** Status of the program at instant `now`. A missing start date means "not started". */
 export function getProgramStatus(
   startDate: string | null | undefined,

@@ -1,7 +1,7 @@
 import "server-only";
 import { db } from "@/lib/supabase/admin";
 import { LESSON_COLUMNS, type Lesson } from "@/lib/types";
-import { getProgramStatus, type ProgramStatus } from "@/lib/week";
+import { getProgramStatus, startDateToSave, type ProgramStatus } from "@/lib/week";
 
 export async function getStartDate(): Promise<string | null> {
   const { data, error } = await db()
@@ -17,7 +17,16 @@ export async function getStatus(now: Date = new Date()): Promise<{
   startDate: string | null;
   status: ProgramStatus;
 }> {
-  const startDate = await getStartDate();
+  let startDate = await getStartDate();
+  // No start date to manage: the program starts automatically in the current week.
+  const toSave = startDateToSave(startDate, now);
+  if (toSave) {
+    const { error } = await db()
+      .from("settings")
+      .upsert({ id: 1, program_start_date: toSave }, { onConflict: "id" });
+    if (error) throw error;
+    startDate = toSave;
+  }
   return { startDate, status: getProgramStatus(startDate, now) };
 }
 

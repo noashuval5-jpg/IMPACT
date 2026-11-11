@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   closedWeeks,
+  currentSunday,
+  startDateToSave,
   getProgramStatus,
   isSunday,
   jerusalemDate,
@@ -116,6 +118,25 @@ describe("getProgramStatus", () => {
       kind: "active",
       week: 3,
     });
+  });
+});
+
+describe("currentSunday / startDateToSave", () => {
+  it("finds the Sunday of the Jerusalem week", () => {
+    // Wednesday 2026-11-11 noon
+    expect(currentSunday(new Date("2026-11-11T10:00:00Z"))).toBe("2026-11-08");
+    // Saturday 23:30 Jerusalem is still the previous week
+    expect(currentSunday(new Date("2026-11-14T21:30:00Z"))).toBe("2026-11-08");
+    // Sunday 00:30 Jerusalem starts a new week
+    expect(currentSunday(new Date("2026-11-14T22:30:00Z"))).toBe("2026-11-15");
+  });
+
+  it("starts the program this week when no date or a future date is stored", () => {
+    const now = new Date("2026-11-11T10:00:00Z");
+    expect(startDateToSave(null, now)).toBe("2026-11-08");
+    expect(startDateToSave("2026-12-06", now)).toBe("2026-11-08");
+    expect(startDateToSave("2026-11-01", now)).toBeNull();
+    expect(startDateToSave("2026-11-08", now)).toBeNull();
   });
 });
 
