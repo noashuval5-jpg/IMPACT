@@ -43,7 +43,7 @@ export default async function DashboardPage() {
   const coachById = new Map(coaches.map((c) => [c.id, c]));
   const never = stats.coaches.filter((c) => c.never);
   const neverIds = new Set(never.map((c) => c.coachId));
-  const pending = stats.coaches.filter((c) => c.pendingGroups.length > 0);
+  const pending = stats.coaches.filter((c) => c.pendingThisWeek);
 
   return (
     <div className="grid min-w-0 gap-5">
@@ -55,18 +55,19 @@ export default async function DashboardPage() {
       {status.kind === "active" ? (
         <div className="grid gap-4 sm:grid-cols-3">
           <StatCard
-            label={t.groupsDelivered}
-            value={`${stats.current.groupsPct}%`}
+            label={t.coachesDelivered}
+            value={`${stats.current.pct}%`}
             sub={fillTemplate(t.doneOutOf, {
-              done: stats.current.groupsDone,
-              total: stats.current.groupsTotal,
+              done: stats.current.delivered,
+              total: stats.current.total,
             })}
-            tone={stats.current.groupsPct >= 80 ? "ok" : "brand"}
+            tone={stats.current.pct >= 80 ? "ok" : "brand"}
           />
           <StatCard
-            label={t.coachesDelivered}
-            value={String(stats.current.coachesDelivered)}
-            sub={fillTemplate(t.totalCoaches, { n: stats.current.coachesTotal })}
+            label={t.notDeliveredThisWeek}
+            value={String(pending.length)}
+            sub={fillTemplate(t.totalCoaches, { n: stats.current.total })}
+            tone={pending.length > 0 ? "bad" : "ok"}
           />
           <StatCard
             label={t.coachesNever}
@@ -114,9 +115,6 @@ export default async function DashboardPage() {
                       <p className="font-semibold">
                         {c.name}
                         {c.never ? <NeverBadge t={t} /> : null}
-                      </p>
-                      <p className="text-sm text-muted">
-                        {t.pendingGroups}: {c.pendingGroups.join(", ")}
                       </p>
                     </div>
                     {reminder ? (

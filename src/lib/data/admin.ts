@@ -1,7 +1,7 @@
 import "server-only";
 import { headers } from "next/headers";
 import { db } from "@/lib/supabase/admin";
-import { LESSON_COLUMNS, type Coach, type Completion, type Group, type Lesson } from "@/lib/types";
+import { LESSON_COLUMNS, type Coach, type Completion, type Lesson } from "@/lib/types";
 
 /** Admin-only reads. Callers must have passed requireAdmin(). */
 
@@ -14,14 +14,6 @@ export async function listCoaches(opts: { activeOnly?: boolean } = {}): Promise<
   const { data, error } = await q;
   if (error) throw error;
   return (data ?? []) as Coach[];
-}
-
-export async function listGroups(opts: { activeOnly?: boolean } = {}): Promise<Group[]> {
-  let q = db().from("groups").select("id,name,coach_id,active,created_at").order("created_at");
-  if (opts.activeOnly) q = q.eq("active", true);
-  const { data, error } = await q;
-  if (error) throw error;
-  return (data ?? []) as Group[];
 }
 
 export async function listLessons(): Promise<Lesson[]> {

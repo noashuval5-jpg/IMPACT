@@ -1,5 +1,5 @@
 import { requireAdmin } from "@/lib/auth";
-import { coachLink, listCoaches, listGroups, siteUrl } from "@/lib/data/admin";
+import { coachLink, listCoaches, siteUrl } from "@/lib/data/admin";
 import { getDict } from "@/lib/i18n/dict";
 import { getI18n } from "@/lib/i18n/server";
 import { fillTemplate, waLink } from "@/lib/phone";
@@ -8,11 +8,7 @@ import { CoachesManager, type CoachRow } from "./CoachesManager";
 export default async function CoachesPage() {
   await requireAdmin();
   const { t } = await getI18n("he");
-  const [coaches, groups, base] = await Promise.all([
-    listCoaches({ activeOnly: true }),
-    listGroups({ activeOnly: true }),
-    siteUrl(),
-  ]);
+  const [coaches, base] = await Promise.all([listCoaches({ activeOnly: true }), siteUrl()]);
 
   const rows: CoachRow[] = coaches.map((c) => {
     const link = coachLink(base, c.token);
@@ -29,7 +25,6 @@ export default async function CoachesPage() {
       language: c.language,
       link,
       welcomeHref: c.phone ? waLink(c.phone, welcome) : null,
-      groupNames: groups.filter((g) => g.coach_id === c.id).map((g) => g.name),
     };
   });
 

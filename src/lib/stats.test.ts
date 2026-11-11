@@ -6,19 +6,13 @@ const coaches = [
   { id: "b", full_name: "בסאם" },
   { id: "c", full_name: "גלית" }, // never delivers
 ];
-const groups = [
-  { id: "g1", name: "קבוצה 1", coach_id: "a" },
-  { id: "g2", name: "קבוצה 2", coach_id: "a" },
-  { id: "g3", name: "קבוצה 3", coach_id: "b" },
-  { id: "g4", name: "קבוצה 4", coach_id: "c" },
-  { id: "gx", name: "של מאמן לא פעיל", coach_id: "zzz" },
-];
 const completions = [
-  { group_id: "g1", coach_id: "a", week_number: 1 },
-  { group_id: "g1", coach_id: "a", week_number: 2 },
-  { group_id: "g1", coach_id: "a", week_number: 3 },
-  { group_id: "g2", coach_id: "a", week_number: 1 },
-  { group_id: "g3", coach_id: "b", week_number: 2 },
+  { coach_id: "a", week_number: 1 },
+  { coach_id: "a", week_number: 2 },
+  { coach_id: "a", week_number: 3 },
+  { coach_id: "a", week_number: 3 }, // duplicate (old data with two groups) counts once
+  { coach_id: "b", week_number: 2 },
+  { coach_id: "zzz", week_number: 1 }, // inactive coach, ignored
 ];
 
 describe("cellState", () => {
@@ -32,26 +26,18 @@ describe("cellState", () => {
 });
 
 describe("computeStats", () => {
-  const stats = computeStats(coaches, groups, completions, { kind: "active", week: 3 });
+  const stats = computeStats(coaches, completions, { kind: "active", week: 3 });
 
-  it("ignores groups of inactive coaches", () => {
-    expect(stats.rows.map((r) => r.groupId)).not.toContain("gx");
-    expect(stats.rows).toHaveLength(4);
+  it("has one row per active coach", () => {
+    expect(stats.rows.map((r) => r.coachId)).toEqual(["a", "b", "c"]);
   });
 
   it("summarises the current week", () => {
-    expect(stats.current).toEqual({
-      week: 3,
-      groupsDone: 1,
-      groupsTotal: 4,
-      groupsPct: 25,
-      coachesDelivered: 1,
-      coachesTotal: 3,
-    });
+    expect(stats.current).toEqual({ week: 3, delivered: 1, total: 3, pct: 33 });
   });
 
   it("gives weekly percentages up to the current week", () => {
-    expect(stats.weekly.map((w) => w.pct)).toEqual([50, 50, 25]);
+    expect(stats.weekly.map((w) => w.pct)).toEqual([33, 67, 33]);
   });
 
   it("flags coaches who never delivered after a full week", () => {
@@ -61,27 +47,32 @@ describe("computeStats", () => {
   });
 
   it("does not flag anyone during week 1", () => {
-    const s = computeStats(coaches, groups, [], { kind: "active", week: 1 });
-    expect(s.neverCount).toBe(0);
+    expect(computeStats(coaches, [], { kind: "active", week: 1 }).neverCount).toBe(0);
   });
 
   it("computes per-coach rates without penalising the open week", () => {
-    const a = stats.coaches.find((c) => c.coachId === "a");
-    // g1: w1 w2 w3 done; g2: w1 done, w2 missed, w3 pending (not counted)
-    expect(a).toMatchObject({ done: 4, counted: 5, rate: 80, pendingGroups: ["קבוצה 2"] });
-  });
-
-  it("lists pending groups for the reminder list", () => {
-    expect(stats.coaches.find((c) => c.coachId === "b")?.pendingGroups).toEqual(["קבוצה 3"]);
+    expect(stats.coaches.find((c) => c.coachId === "a")).toMatchObject({
+      done: 3,
+      counted: 3,
+      rate: 100,
+      pendingThisWeek: false,
+    });
+    // b: w1 missed, w2 done, w3 pending (not counted)
+    expect(stats.coaches.find((c) => c.coachId === "b")).toMatchObject({
+      done: 1,
+      counted: 2,
+      rate: 50,
+      pendingThisWeek: true,
+    });
   });
 
   it("handles not started and finished", () => {
-    const ns = computeStats(coaches, groups, [], { kind: "not_started" });
+    const ns = computeStats(coaches, [], { kind: "not_started" });
     expect(ns.weekly).toEqual([]);
     expect(ns.current.week).toBeNull();
-    const fin = computeStats(coaches, groups, completions, { kind: "finished" });
+    const fin = computeStats(coaches, completions, { kind: "finished" });
     expect(fin.weekly).toHaveLength(10);
     expect(fin.rows[0]?.cells[9]).toBe("missed");
-    expect(fin.overall.counted).toBe(40);
+    expect(fin.overall.counted).toBe(30);
   });
 });

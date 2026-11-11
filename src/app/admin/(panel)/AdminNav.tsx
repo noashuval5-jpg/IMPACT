@@ -10,7 +10,6 @@ export function AdminNav({ t }: { t: Dict }) {
   const items = [
     { href: "/admin", label: t.dashboard },
     { href: "/admin/coaches", label: t.coaches },
-    { href: "/admin/groups", label: t.groups },
     { href: "/admin/lessons", label: t.lessons },
     { href: "/admin/report", label: t.report },
   ];

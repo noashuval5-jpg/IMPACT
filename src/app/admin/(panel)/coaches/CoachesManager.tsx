@@ -21,7 +21,6 @@ export type CoachRow = {
   language: Lang;
   link: string;
   welcomeHref: string | null;
-  groupNames: string[];
 };
 
 function CoachForm({
@@ -138,11 +137,6 @@ export function CoachesManager({ t, rows }: { t: Dict; rows: CoachRow[] }) {
                         <p className="text-sm text-muted" dir="ltr">
                           {c.phone || t.noPhone}
                         </p>
-                        {c.groupNames.length > 0 ? (
-                          <p className="mt-1 text-sm">
-                            {t.groups}: {c.groupNames.join(", ")}
-                          </p>
-                        ) : null}
                       </div>
                       <button type="button" className={btn.small} onClick={() => setEditing(c.id)}>
                         {t.edit}

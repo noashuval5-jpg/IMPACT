@@ -3,13 +3,13 @@ import { LessonCards } from "@/components/LessonCards";
 import { TopBar } from "@/components/TopBar";
 import Link from "next/link";
 import { btn, Card } from "@/components/ui";
-import { findCoachByToken, getCoachGroups } from "@/lib/data/coach";
+import { findCoachByToken, getCoachWeekDone } from "@/lib/data/coach";
 import { getLesson, getStatus } from "@/lib/data/common";
 import { getI18n } from "@/lib/i18n/server";
 import { lessonView } from "@/lib/lessonView";
 import { fillTemplate } from "@/lib/phone";
 import { parseWeek } from "@/lib/validate";
-import { GroupsCard } from "./GroupsCard";
+import { DoneCard } from "./DoneCard";
 import { WeekPicker } from "./WeekPicker";
 
 export const dynamic = "force-dynamic";
@@ -54,9 +54,9 @@ export default async function CoachPage({
     (status.kind === "finished" ? 10 : 1);
   const isCurrent = selected === current;
 
-  const [lesson, groups] = await Promise.all([
+  const [lesson, doneAt] = await Promise.all([
     getLesson(selected),
-    current !== null ? getCoachGroups(coach.id, current) : Promise.resolve([]),
+    current !== null ? getCoachWeekDone(coach.id, current) : Promise.resolve(null),
   ]);
 
   const body = (
@@ -71,15 +71,15 @@ export default async function CoachPage({
           ) : null}
         </div>
         {isCurrent ? (
-          <a href="#groups" className={btn.secondary + " min-h-12 px-4 text-sm"}>
+          <a href="#done" className={btn.secondary + " min-h-12 px-4 text-sm"}>
             {t.jumpToDone}
           </a>
         ) : null}
       </div>
       <LessonCards t={t} lesson={lessonView(lesson, lang)} />
       {isCurrent ? (
-        <div id="groups" className="scroll-mt-20">
-          <GroupsCard token={token} groups={groups} t={t} />
+        <div id="done" className="scroll-mt-20">
+          <DoneCard token={token} initialDoneAt={doneAt} t={t} />
         </div>
       ) : (
         <Card>

@@ -63,7 +63,7 @@ export function Matrix({
           <thead>
             <tr>
               <th className="sticky start-0 bg-white px-2 text-start font-medium text-muted">
-                {t.groups}
+                {t.coaches}
               </th>
               {ALL_WEEKS.map((w) => (
                 <th key={w} className="w-9 min-w-9 text-center font-medium text-muted tabular-nums">
@@ -74,10 +74,9 @@ export function Matrix({
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.groupId}>
+              <tr key={r.coachId}>
                 <th scope="row" className="sticky start-0 bg-white px-2 py-1 text-start font-normal">
-                  <span className="block max-w-48 truncate font-semibold">{r.groupName}</span>
-                  <span className="block max-w-48 truncate text-xs text-muted">
+                  <span className="block max-w-48 truncate font-semibold">
                     {r.coachName}
                     {neverIds.has(r.coachId) ? <NeverBadge t={t} /> : null}
                   </span>

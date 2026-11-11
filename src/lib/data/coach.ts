@@ -6,8 +6,6 @@ import { looksLikeToken } from "@/lib/token";
 /** What the coach page is allowed to know about the coach. Never the phone. */
 export type PublicCoach = { id: string; full_name: string; language: Lang };
 
-export type CoachGroup = { id: string; name: string; doneAt: string | null };
-
 /** Active coach for a token, or null. Never returns phone or token. */
 export async function findCoachByToken(token: string): Promise<PublicCoach | null> {
   if (!looksLikeToken(token)) return null;
@@ -21,46 +19,39 @@ export async function findCoachByToken(token: string): Promise<PublicCoach | nul
   return (data as PublicCoach | null) ?? null;
 }
 
-/** The coach's active groups with their completion for `week`. */
-export async function getCoachGroups(coachId: string, week: number): Promise<CoachGroup[]> {
-  const { data: groups, error } = await db()
-    .from("groups")
-    .select("id,name")
-    .eq("coach_id", coachId)
-    .eq("active", true)
-    .order("created_at");
-  if (error) throw error;
-  const list = (groups ?? []) as { id: string; name: string }[];
-  if (list.length === 0) return [];
-
-  const { data: done, error: err2 } = await db()
+/** When the coach marked `week` as delivered (any of their groups), or null. */
+export async function getCoachWeekDone(coachId: string, week: number): Promise<string | null> {
+  const { data, error } = await db()
     .from("completions")
-    .select("group_id,completed_at")
+    .select("completed_at")
+    .eq("coach_id", coachId)
     .eq("week_number", week)
-    .in(
-      "group_id",
-      list.map((g) => g.id),
-    );
-  if (err2) throw err2;
-  const doneMap = new Map(
-    ((done ?? []) as { group_id: string; completed_at: string }[]).map((c) => [
-      c.group_id,
-      c.completed_at,
-    ]),
-  );
-  return list.map((g) => ({ id: g.id, name: g.name, doneAt: doneMap.get(g.id) ?? null }));
+    .order("completed_at")
+    .limit(1);
+  if (error) throw error;
+  return ((data ?? [])[0]?.completed_at as string | undefined) ?? null;
 }
 
-/** True when the group is active and belongs to the coach. */
-export async function coachOwnsActiveGroup(coachId: string, groupId: string): Promise<boolean> {
-  if (!/^[0-9a-f-]{36}$/i.test(groupId)) return false;
-  const { data, error } = await db()
+/**
+ * MVP: groups are hidden. Each coach uses one internal group; it is created
+ * the first time the coach marks a week as done.
+ */
+export async function getOrCreateCoachGroup(coach: PublicCoach, name: string): Promise<string | null> {
+  const { data: existing, error } = await db()
     .from("groups")
     .select("id")
-    .eq("id", groupId)
-    .eq("coach_id", coachId)
+    .eq("coach_id", coach.id)
     .eq("active", true)
-    .maybeSingle();
-  if (error) throw error;
-  return data !== null;
+    .order("created_at")
+    .limit(1);
+  if (error) return null;
+  const found = (existing ?? [])[0]?.id as string | undefined;
+  if (found) return found;
+  const { data, error: err2 } = await db()
+    .from("groups")
+    .insert({ name, coach_id: coach.id })
+    .select("id")
+    .single();
+  if (err2 || !data) return null;
+  return data.id as string;
 }
