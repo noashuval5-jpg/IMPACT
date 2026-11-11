@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { btn, Card, Notice } from "@/components/ui";
 import type { CoachGroup } from "@/lib/data/coach";
@@ -17,8 +18,11 @@ export function GroupsCard({
   groups: CoachGroup[];
   t: Dict;
 }) {
+  const router = useRouter();
+  // A coach without groups still gets one "done" button; the server creates the group on first use.
+  const rows: CoachGroup[] = groups.length > 0 ? groups : [{ id: "default", name: t.myGroup, doneAt: null }];
   const [state, setState] = useState<Record<string, string | null>>(() =>
-    Object.fromEntries(groups.map((g) => [g.id, g.doneAt])),
+    Object.fromEntries(rows.map((g) => [g.id, g.doneAt])),
   );
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState(false);
@@ -34,6 +38,7 @@ export function GroupsCard({
       const res = makeDone ? await markDone(token, groupId) : await undoDone(token, groupId);
       if (res.ok) {
         setState((s) => ({ ...s, [groupId]: res.doneAt }));
+        if (res.groupId && res.groupId !== groupId) router.refresh();
       } else {
         setState((s) => ({ ...s, [groupId]: previous }));
         setError(true);
@@ -44,12 +49,10 @@ export function GroupsCard({
 
   return (
     <Card title={t.myGroups}>
-      {groups.length === 0 ? (
-        <p className="text-muted">{t.noGroups}</p>
-      ) : (
-        <ul className="grid gap-3">
-          {groups.map((g) => {
-            const doneAt = state[g.id] ?? null;
+      <ul className="grid gap-3">
+          {rows.map((g) => {
+            // After the server creates the default group, the real group arrives as a new row.
+            const doneAt = g.id in state ? (state[g.id] ?? null) : g.doneAt;
             return (
               <li
                 key={g.id}
@@ -88,7 +91,6 @@ export function GroupsCard({
             );
           })}
         </ul>
-      )}
       {error ? (
         <div className="mt-3">
           <Notice tone="error">{t.errorTryAgain}</Notice>

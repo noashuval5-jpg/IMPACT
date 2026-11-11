@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import { LessonCards } from "@/components/LessonCards";
 import { TopBar } from "@/components/TopBar";
-import { Card } from "@/components/ui";
+import Link from "next/link";
+import { btn, Card } from "@/components/ui";
 import { findCoachByToken, getCoachGroups } from "@/lib/data/coach";
 import { getLesson, getStatus } from "@/lib/data/common";
 import { getI18n } from "@/lib/i18n/server";
 import { lessonView } from "@/lib/lessonView";
 import { fillTemplate } from "@/lib/phone";
+import { parseWeek } from "@/lib/validate";
 import { GroupsCard } from "./GroupsCard";
+import { WeekPicker } from "./WeekPicker";
 
 export const dynamic = "force-dynamic";
 
@@ -16,8 +19,15 @@ export const metadata: Metadata = {
   referrer: "no-referrer",
 };
 
-export default async function CoachPage({ params }: { params: Promise<{ token: string }> }) {
+export default async function CoachPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ token: string }>;
+  searchParams: Promise<{ week?: string | string[] }>;
+}) {
   const { token } = await params;
+  const { week: weekParam } = await searchParams;
   const coach = await findCoachByToken(token);
   // Middleware sets the cookie to the coach's language on first visit.
   const { lang, t } = await getI18n(coach?.language ?? "he");
@@ -36,42 +46,69 @@ export default async function CoachPage({ params }: { params: Promise<{ token: s
   }
 
   const { status } = await getStatus();
-  const firstName = coach.full_name;
+  const current = status.kind === "active" ? status.week : null;
+  // Coaches can read every week's content; marking "done" is only for the current week.
+  const selected =
+    parseWeek(Array.isArray(weekParam) ? weekParam[0] : weekParam) ??
+    current ??
+    (status.kind === "finished" ? 10 : 1);
+  const isCurrent = selected === current;
 
-  let body: React.ReactNode;
-  if (status.kind !== "active") {
-    body = (
-      <Card>
-        <p className="text-center text-lg">
-          {status.kind === "finished" ? t.finished : t.notStarted}
-        </p>
-      </Card>
-    );
-  } else {
-    const [lesson, groups] = await Promise.all([
-      getLesson(status.week),
-      getCoachGroups(coach.id, status.week),
-    ]);
-    body = (
-      <>
-        <LessonCards t={t} lesson={lessonView(lesson, lang)} />
-        <GroupsCard token={token} groups={groups} t={t} />
-      </>
-    );
-  }
+  const [lesson, groups] = await Promise.all([
+    getLesson(selected),
+    current !== null ? getCoachGroups(coach.id, current) : Promise.resolve([]),
+  ]);
+
+  const body = (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <h2 className="text-xl font-bold">{fillTemplate(t.week, { n: selected })}</h2>
+          {isCurrent ? (
+            <span className="rounded-full bg-brand px-2.5 py-0.5 text-sm text-white">
+              {t.currentWeekBadge}
+            </span>
+          ) : null}
+        </div>
+        {isCurrent ? (
+          <a href="#groups" className={btn.secondary + " min-h-12 px-4 text-sm"}>
+            {t.jumpToDone}
+          </a>
+        ) : null}
+      </div>
+      <LessonCards t={t} lesson={lessonView(lesson, lang)} />
+      {isCurrent ? (
+        <div id="groups" className="scroll-mt-20">
+          <GroupsCard token={token} groups={groups} t={t} />
+        </div>
+      ) : (
+        <Card>
+          <p className="text-muted">
+            {status.kind === "active" ? t.markOnlyCurrent : status.kind === "finished" ? t.finished : t.notStarted}
+          </p>
+          {current !== null ? (
+            <Link href={`/c/${token}`} className={btn.primary + " mt-3 w-full"}>
+              {t.backToThisWeek}
+            </Link>
+          ) : null}
+        </Card>
+      )}
+    </>
+  );
 
   return (
     <>
       <TopBar lang={lang} t={t} />
       <main className="mx-auto grid max-w-xl gap-4 px-4 py-5">
         <div>
-          <h1 className="text-2xl font-bold">{fillTemplate(t.hello, { name: firstName })}</h1>
+          <h1 className="text-2xl font-bold">{fillTemplate(t.hello, { name: coach.full_name })}</h1>
           {status.kind === "active" ? (
             <p className="mt-1 text-muted">
               {fillTemplate(t.weekOfTotal, { n: status.week })}
             </p>
           ) : null}
         </div>
+        <WeekPicker t={t} token={token} selected={selected} current={current} />
         {body}
         <p className="pb-6 pt-2 text-center text-sm text-muted">{t.tagline}</p>
       </main>
